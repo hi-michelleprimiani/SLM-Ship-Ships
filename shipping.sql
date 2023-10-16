@@ -33,6 +33,8 @@ CREATE TABLE `Ship` (
 INSERT INTO `Dock` VALUES (null, 'Antwerp', 1290);
 INSERT INTO `Dock` VALUES (null, 'Shanghai', 840);
 INSERT INTO `Dock` VALUES (null, 'Los Angeles', 1055);
+INSERT INTO `Dock` VALUES (null, 'Tampa', 155);
+
 
 
 INSERT INTO `Hauler` VALUES (null, "CTS", 1);
