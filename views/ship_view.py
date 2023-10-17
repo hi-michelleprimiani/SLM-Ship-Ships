@@ -37,7 +37,7 @@ def delete_ship(pk):
     return True if number_of_rows_deleted > 0 else False
 
 
-def list_ships(url=None):
+def list_ships(url):
     # Open a connection to the database
     with sqlite3.connect("./shipping.db") as conn:
         conn.row_factory = sqlite3.Row
@@ -101,7 +101,7 @@ def list_ships(url=None):
     return serialized_ships
 
 
-def retrieve_ship(pk, url=None):
+def retrieve_ship(pk, url):
     # Open a connection to the database
     with sqlite3.connect("./shipping.db") as conn:
         conn.row_factory = sqlite3.Row
@@ -122,6 +122,26 @@ def retrieve_ship(pk, url=None):
             JOIN Hauler h ON s.hauler_id = h.id
             WHERE s.id = ?
             """, (pk,))
+
+            query_results = db_cursor.fetchone()
+
+            hauler = {
+                "id": query_results['haulerId'],
+                "name": query_results['haulerName'],
+                "dock_id": query_results["dock_id"]
+            }
+
+            # Build a ship dictionary that includes the hauler dictionary as a nested dictionary
+            ship = {
+                "id": query_results['id'],
+                "name": query_results['name'],
+                "hauler_id": query_results["hauler_id"],
+                "hauler": hauler
+            }
+
+            # Serialize the ship dictionary to JSON encoded string
+            serialized_ship = json.dumps(ship)
+
         else:
             # Write the default SQL query to get the information you want
             db_cursor.execute("""
@@ -133,32 +153,8 @@ def retrieve_ship(pk, url=None):
             WHERE s.id = ?
             """, (pk,))
 
-        query_results = db_cursor.fetchone()
+            query_results = db_cursor.fetchone()
 
-        if query_results:
-            if '_expand' in url:
-                # Build a hauler dictionary with the correct keys and values
-                hauler = {
-                    "id": query_results['haulerId'],
-                    "name": query_results['haulerName'],
-                    "dock_id": query_results["dock_id"]
-                }
-
-                # Build a ship dictionary that includes the hauler dictionary as a nested dictionary
-                ship = {
-                    "id": query_results['id'],
-                    "name": query_results['name'],
-                    "hauler_id": query_results["hauler_id"],
-                    "hauler": hauler
-                }
-
-                # Serialize the ship dictionary to JSON encoded string
-                serialized_ship = json.dumps(ship)
-            else:
-                # Serialize the query results as is to JSON encoded string
-                serialized_ship = json.dumps(dict(query_results))
-        else:
-            # Return a 404 response if the ship with the given ID is not found
-            return None
+            serialized_ship = json.dumps(dict(query_results))
 
     return serialized_ship
