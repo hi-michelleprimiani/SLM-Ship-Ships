@@ -46,7 +46,6 @@ def list_ships(url):
         # Check if the '_expand' parameter exists in the URL dictionary
         if "_expand" in url['query_params']:
             # Handle the case when _expand exists in the URL
-            # Modify your query or processing here as needed
             db_cursor.execute("""
             SELECT
                 s.id,
@@ -74,7 +73,6 @@ def list_ships(url):
         # Initialize an empty list and then add each dictionary to it
         ships = []
         for row in query_results:
-            # Custom response building
             # if '_expand' in url:
             # Build a hauler dictionary with the correct keys and values
             hauler = {
