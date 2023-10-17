@@ -1,3 +1,4 @@
+""" imports """
 import json
 from http.server import HTTPServer
 from nss_handler import HandleRequests, status
@@ -17,6 +18,7 @@ class JSONServer(HandleRequests):
 
         response_body = ""
         url = self.parse_url(self.path)
+        # url_params = url.get("query_params", {})  # Get the query parameters
 
         if url["requested_resource"] == "docks":
             if url["pk"] != 0:
@@ -36,10 +38,10 @@ class JSONServer(HandleRequests):
 
         elif url["requested_resource"] == "ships":
             if url["pk"] != 0:
-                response_body = retrieve_ship(url["pk"])
+                response_body = retrieve_ship(url["pk"], url)
                 return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
-            response_body = list_ships()
+            response_body = list_ships(url)
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
         else:
@@ -116,11 +118,6 @@ class JSONServer(HandleRequests):
         pass
 
 
-
-
-
-
-
 #
 # THE CODE BELOW THIS LINE IS NOT IMPORTANT FOR REACHING YOUR LEARNING OBJECTIVES
 #
@@ -128,6 +125,7 @@ def main():
     host = ''
     port = 8000
     HTTPServer((host, port), JSONServer).serve_forever()
+
 
 if __name__ == "__main__":
     main()
