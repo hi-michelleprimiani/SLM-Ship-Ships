@@ -18,7 +18,7 @@ class JSONServer(HandleRequests):
 
         response_body = ""
         url = self.parse_url(self.path)
-        url_params = url.get("query_params", {})  # Get the query parameters
+        # url_params = url.get("query_params", {})  # Get the query parameters
 
         if url["requested_resource"] == "docks":
             if url["pk"] != 0:
@@ -38,10 +38,10 @@ class JSONServer(HandleRequests):
 
         elif url["requested_resource"] == "ships":
             if url["pk"] != 0:
-                response_body = retrieve_ship(url["pk"], url_params)
+                response_body = retrieve_ship(url["pk"], url)
                 return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
-            response_body = list_ships()
+            response_body = list_ships(url)
             return self.response(response_body, status.HTTP_200_SUCCESS.value)
 
         else:

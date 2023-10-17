@@ -37,14 +37,14 @@ def delete_ship(pk):
     return True if number_of_rows_deleted > 0 else False
 
 
-def list_ships(url_params=None):
+def list_ships(url=None):
     # Open a connection to the database
     with sqlite3.connect("./shipping.db") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
         # Check if the '_expand' parameter exists in the URL dictionary
-        if '_expand' in url_params:
+        if "_expand" in url['query_params']:
             # Handle the case when _expand exists in the URL
             # Modify your query or processing here as needed
             db_cursor.execute("""
@@ -75,7 +75,7 @@ def list_ships(url_params=None):
         ships = []
         for row in query_results:
             # Custom response building
-            # if '_expand' in url_params:
+            # if '_expand' in url:
             # Build a hauler dictionary with the correct keys and values
             hauler = {
                 "id": row['haulerId'],
@@ -101,14 +101,14 @@ def list_ships(url_params=None):
     return serialized_ships
 
 
-def retrieve_ship(pk, url_params=None):
+def retrieve_ship(pk, url=None):
     # Open a connection to the database
     with sqlite3.connect("./shipping.db") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
         # Check if the '_expand' parameter exists in the URL dictionary
-        if '_expand' in url_params:
+        if "_expand" in url['query_params']:
             # Handle the case when _expand exists in the URL
             db_cursor.execute("""
             SELECT
@@ -136,7 +136,7 @@ def retrieve_ship(pk, url_params=None):
         query_results = db_cursor.fetchone()
 
         if query_results:
-            if '_expand' in url_params:
+            if '_expand' in url:
                 # Build a hauler dictionary with the correct keys and values
                 hauler = {
                     "id": query_results['haulerId'],
