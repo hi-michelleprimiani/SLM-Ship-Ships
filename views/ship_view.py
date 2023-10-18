@@ -46,7 +46,6 @@ def list_ships(url):
         # Check if the '_expand' parameter exists in the URL dictionary
         if "_expand" in url['query_params']:
             # Handle the case when _expand exists in the URL
-            # Modify your query or processing here as needed
             db_cursor.execute("""
             SELECT
                 s.id,
@@ -73,27 +72,33 @@ def list_ships(url):
 
         # Initialize an empty list and then add each dictionary to it
         ships = []
-        for row in query_results:
-            # Custom response building
-            # if '_expand' in url:
-            # Build a hauler dictionary with the correct keys and values
-            hauler = {
-                "id": row['haulerId'],
-                "name": row['haulerName'],
-                "dock_id": row["dock_id"]
-            }
-            # Build a ship dictionary that includes the hauler dictionary as a nested dictionary
-            ship = {
-                "id": row['id'],
-                "name": row['name'],
-                "hauler_id": row["hauler_id"],
-                "hauler": hauler
-            }
-         # Append the new ship dictionary to the list of ships
-            ships.append(ship)
-            # else:
-            # If not expanding, append the row as is
-            # ships.append(dict(row))
+        if "_expand" in url['query_params']:
+            for row in query_results:
+                # if '_expand' in url:
+                # Build a hauler dictionary with the correct keys and values
+                hauler = {
+                    "id": row['haulerId'],
+                    "name": row['haulerName'],
+                    "dock_id": row["dock_id"]
+                }
+                # Build a ship dictionary that includes the hauler dictionary as a nested dictionary
+                ship = {
+                    "id": row['id'],
+                    "name": row['name'],
+                    "hauler_id": row["hauler_id"],
+                    "hauler": hauler
+                }
+            # Append the new ship dictionary to the list of ships
+                ships.append(ship)
+        else:
+            for row in query_results:
+                ship = {
+                    "id": row['id'],
+                    "name": row['name'],
+                    "hauler_id": row["hauler_id"],
+                }
+                # If not expanding, append the row as is
+                ships.append(dict(row))
 
         # Serialize Python list to JSON encoded string
         serialized_ships = json.dumps(ships)
@@ -123,6 +128,7 @@ def retrieve_ship(pk, url):
             WHERE s.id = ?
             """, (pk,))
 
+            # method that is used to retrieve a single row of data from the result set of a database query.
             query_results = db_cursor.fetchone()
 
             hauler = {
@@ -154,7 +160,6 @@ def retrieve_ship(pk, url):
             """, (pk,))
 
             query_results = db_cursor.fetchone()
-
             serialized_ship = json.dumps(dict(query_results))
 
     return serialized_ship
