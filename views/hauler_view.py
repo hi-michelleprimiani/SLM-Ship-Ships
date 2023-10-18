@@ -59,13 +59,12 @@ def list_haulers(url):
                 ON h.id = s.hauler_id
             """)
 
+            query_results = db_cursor.fetchall()
             # Initialize a dictionary to store haulers and their embedded ships
             haulers = {}
-
             # Iterate over query results
-            for row in db_cursor.fetchall():
+            for row in query_results:
                 hauler_id = row['id']
-
                 # If the hauler is not in the dictionary, add it with its information
                 if hauler_id not in haulers:
                     haulers[hauler_id] = {
@@ -74,8 +73,8 @@ def list_haulers(url):
                         "dock_id": row['dock_id'],
                         "ships": []
                     }
-
                 # Add the ship information to the hauler's embedded ships list
+                # Checks if ship_id is truthy
                 if row['ship_id']:
                     ship_info = {
                         "id": row['ship_id'],

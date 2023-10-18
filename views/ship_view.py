@@ -2,6 +2,22 @@ import sqlite3
 import json
 
 
+def create_ship(ship_data):
+    with sqlite3.connect("./shipping.db") as conn:
+        db_cursor = conn.cursor()
+
+        # Insert a new ship into the database and retrieve its ID
+        db_cursor.execute("""
+            INSERT INTO Ship (name, hauler_id)
+            VALUES (?, ?)
+            """, (ship_data['name'], ship_data['hauler_id']))
+
+        # Get the ID of the newly created ship
+        new_ship_id = db_cursor.lastrowid
+
+        return new_ship_id
+
+
 def update_ship(id, ship_data):
     with sqlite3.connect("./shipping.db") as conn:
         db_cursor = conn.cursor()

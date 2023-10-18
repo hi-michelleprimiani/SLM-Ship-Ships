@@ -18,7 +18,7 @@ class JSONServer(HandleRequests):
 
         response_body = ""
         url = self.parse_url(self.path)
-        
+
         if url["requested_resource"] == "docks":
             if url["pk"] != 0:
                 response_body = retrieve_dock(url["pk"])
@@ -54,8 +54,11 @@ class JSONServer(HandleRequests):
         pk = url["pk"]
 
         # Get the request body JSON for the new data
+        # Retrieves 'content-length' from HTTP request header. Size of bytes. Takes content-length, converts it into an integer
         content_len = int(self.headers.get('content-length', 0))
+        # file-like obj that represents the input stream for the HTTP request
         request_body = self.rfile.read(content_len)
+        # After reading the request body, this line parses the JSON data and stores the resulting python data in variable. Deserializes the JSON Data so that it can be a python obj
         request_body = json.loads(request_body)
 
         if url["requested_resource"] == "ships":
