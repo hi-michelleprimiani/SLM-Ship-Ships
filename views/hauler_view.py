@@ -140,9 +140,9 @@ def retrieve_hauler(pk, url):
 
             # Initialize a dictionary to store the hauler's information and embedded ships
             hauler_info = None
-
+            query_results = db_cursor.fetchall()
             # Iterate over query results
-            for row in db_cursor.fetchall():
+            for row in query_results:
                 if hauler_info is None:
                     hauler_info = {
                         "id": row['id'],
