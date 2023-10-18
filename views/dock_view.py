@@ -1,6 +1,7 @@
 import sqlite3
 import json
 
+
 def update_dock(id, dock_data):
     with sqlite3.connect("./shipping.db") as conn:
         db_cursor = conn.cursor()
@@ -17,6 +18,7 @@ def update_dock(id, dock_data):
         )
 
     return True if db_cursor.rowcount > 0 else False
+
 
 def delete_dock(pk):
     with sqlite3.connect("./shipping.db") as conn:
@@ -50,7 +52,7 @@ def list_docks():
         query_results = db_cursor.fetchall()
 
         # Initialize an empty list and then add each dictionary to it
-        docks=[]
+        docks = []
         for row in query_results:
             docks.append(dict(row))
 
@@ -58,6 +60,7 @@ def list_docks():
         serialized_docks = json.dumps(docks)
 
     return serialized_docks
+
 
 def retrieve_dock(pk):
     # Open a connection to the database
@@ -80,3 +83,27 @@ def retrieve_dock(pk):
         serialized_dock = json.dumps(dict(query_results))
 
     return serialized_dock
+
+
+def create_dock(dock_data):
+    # Extract dock data
+    location = dock_data.get('location', '')
+    capacity = dock_data.get('capacity', 0)
+
+    # Connect to the database
+    with sqlite3.connect("./shipping.db") as conn:
+        db_cursor = conn.cursor()
+
+        # Insert a new dock record
+        db_cursor.execute(
+            """
+            INSERT INTO Dock (location, capacity)
+            VALUES (?, ?)
+            """,
+            (location, capacity)
+        )
+
+        # Get the ID of the newly created dock
+        new_dock_id = db_cursor.lastrowid
+
+    return new_dock_id  # Return the newly created dock as a dictionary
