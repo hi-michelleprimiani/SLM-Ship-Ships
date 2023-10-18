@@ -74,7 +74,6 @@ def list_ships(url):
         ships = []
         if "_expand" in url['query_params']:
             for row in query_results:
-
                 # if '_expand' in url:
                 # Build a hauler dictionary with the correct keys and values
                 hauler = {
@@ -161,7 +160,6 @@ def retrieve_ship(pk, url):
             """, (pk,))
 
             query_results = db_cursor.fetchone()
-
             serialized_ship = json.dumps(dict(query_results))
 
     return serialized_ship
