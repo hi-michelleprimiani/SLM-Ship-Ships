@@ -3,6 +3,9 @@ import json
 
 
 def create_ship(ship_data):
+    name = ship_data.get('name', '')
+    hauler_id = ship_data.get('hauler_id', 0)
+
     with sqlite3.connect("./shipping.db") as conn:
         db_cursor = conn.cursor()
 
@@ -10,7 +13,9 @@ def create_ship(ship_data):
         db_cursor.execute("""
             INSERT INTO Ship (name, hauler_id)
             VALUES (?, ?)
-            """, (ship_data['name'], ship_data['hauler_id']))
+            """,
+                          (name, hauler_id)
+                          )
 
         # Get the ID of the newly created ship
         new_ship_id = db_cursor.lastrowid

@@ -5,9 +5,9 @@ from nss_handler import HandleRequests, status
 
 
 # Add your imports below this line
-from views import list_docks, retrieve_dock, delete_dock, update_dock
+from views import list_docks, retrieve_dock, delete_dock, update_dock, create_dock
 from views import list_haulers, retrieve_hauler, delete_hauler, update_hauler
-from views import list_ships, retrieve_ship, delete_ship, update_ship
+from views import list_ships, retrieve_ship, delete_ship, update_ship, create_ship
 
 
 class JSONServer(HandleRequests):
@@ -116,8 +116,41 @@ class JSONServer(HandleRequests):
 
     def do_POST(self):
         """Handle POST requests from a client"""
+        # Parse the URL and get the requested resource
+        url = self.parse_url(self.path)
+        requested_resource = url["requested_resource"]
 
-        pass
+        # Get the request body JSON for the new data
+        content_len = int(self.headers.get('content-length', 0))
+        request_body = self.rfile.read(content_len)
+        request_body = json.loads(request_body)
+
+        if requested_resource == "docks":
+            # Add a new dock to the database using the request body data
+            new_dock_id = create_dock(request_body)
+            if new_dock_id is not None:
+                # Return a response with the new dock's ID and a 201 Created status
+                response_body = {"id": new_dock_id}
+                return self.response(json.dumps(response_body), status.HTTP_201_SUCCESS_CREATED.value)
+
+        # elif requested_resource == "haulers":
+        #     # Add a new hauler to the database using the request body data
+        #     new_hauler_id = create_hauler(request_body)
+        #     if new_hauler_id is not None:
+        #         # Return a response with the new hauler's ID and a 201 Created status
+        #         response_body = {"id": new_hauler_id}
+        #         return self.response(json.dumps(response_body), status.HTTP_201_SUCCESS_CREATED.value)
+
+        elif requested_resource == "ships":
+            # Add a new ship to the database using the request body data
+            new_ship_id = create_ship(request_body)
+            if new_ship_id is not None:
+                # Return a response with the new ship's ID and a 201 Created status
+                response_body = {"id": new_ship_id}
+                return self.response(json.dumps(response_body), status.HTTP_201_SUCCESS_CREATED.value)
+
+        # # If the requested resource is not recognized, return a 404 Not Found response
+        # return self.response("Requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
 
 
 #
