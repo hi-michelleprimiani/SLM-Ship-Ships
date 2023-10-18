@@ -44,7 +44,7 @@ def list_ships(url):
         db_cursor = conn.cursor()
 
         # Check if the '_expand' parameter exists in the URL dictionary
-        if "_expand" in url['query_params']:
+        if "expand" in url['query_params']:
             # Handle the case when _expand exists in the URL
             db_cursor.execute("""
             SELECT
@@ -72,7 +72,7 @@ def list_ships(url):
 
         # Initialize an empty list and then add each dictionary to it
         ships = []
-        if "_expand" in url['query_params']:
+        if "expand" in url['query_params']:
             for row in query_results:
                 # if '_expand' in url:
                 # Build a hauler dictionary with the correct keys and values
@@ -113,7 +113,7 @@ def retrieve_ship(pk, url):
         db_cursor = conn.cursor()
 
         # Check if the '_expand' parameter exists in the URL dictionary
-        if "_expand" in url['query_params']:
+        if "expand" in url['query_params']:
             # Handle the case when _expand exists in the URL
             db_cursor.execute("""
             SELECT
