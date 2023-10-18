@@ -38,56 +38,38 @@ def delete_hauler(pk):
 
 
 def list_haulers(url):
-    # Open a connection to the database
     with sqlite3.connect("./shipping.db") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
-        # Check if the '_embed' parameter exists in the URL dictionary
-        if "_embed" in url['query_params']:
-            # Handle the case when _embed exists in the URL
+        if "_expand" in url['query_params']:
             db_cursor.execute("""
             SELECT
                 h.id,
                 h.name,
                 h.dock_id,
-                s.id as ship_id,
-                s.name as ship_name,
-                s.hauler_id as ship_hauler_id
+                d.id as dockId,
+                d.location as dockLocation,
+                d.capacity as dockCapacity
+            FROM Hauler h
+            JOIN Dock d
+                ON d.id = h.dock_id
+            """)
+        elif "_embed" in url["query_params"]:
+
+            db_cursor.execute("""
+            SELECT
+                h.id,
+                h.name,
+                h.dock_id,
+                s.id as shipId,
+                s.name as shipName,
+                s.hauler_id as shipHaulerId
             FROM Hauler h
             LEFT JOIN Ship s
-                ON h.id = s.hauler_id
+                ON s.hauler_id = h.id
             """)
-
-            # Initialize a dictionary to store haulers and their embedded ships
-            haulers = {}
-
-            # Iterate over query results
-            for row in db_cursor.fetchall():
-                hauler_id = row['id']
-
-                # If the hauler is not in the dictionary, add it with its information
-                if hauler_id not in haulers:
-                    haulers[hauler_id] = {
-                        "id": hauler_id,
-                        "name": row['name'],
-                        "dock_id": row['dock_id'],
-                        "ships": []
-                    }
-
-                # Add the ship information to the hauler's embedded ships list
-                if row['ship_id']:
-                    ship_info = {
-                        "id": row['ship_id'],
-                        "name": row['ship_name'],
-                        "hauler_id": row['ship_hauler_id']
-                    }
-                    haulers[hauler_id]["ships"].append(ship_info)
-
-            # Serialize the haulers dictionary to JSON encoded string
-            serialized_haulers = json.dumps(list(haulers.values()))
         else:
-            # Write the default SQL query to get hauler information
             db_cursor.execute("""
             SELECT
                 h.id,
@@ -96,21 +78,68 @@ def list_haulers(url):
             FROM Hauler h
             """)
 
-            # Fetch all haulers
-            query_results = db_cursor.fetchall()
+        query_results = db_cursor.fetchall()
+        if "_embed" in url["query_params"]:
+            haulers = {}
+            for row in query_results:
+                hauler_id = row["hauler_id"]
+                if hauler_id not in haulers:
+                    haulers[hauler_id] = {
+                        "id": hauler_id,
+                        "name": row["hauler_name"],
+                        "ships": []
+                    }
 
-            # Initialize an empty list and then add each dictionary to it
-            haulers = []
+                if row["ship_id"] is not None:
+                    ship = {
+                        "id": row["ship_id"],
+                        "name": row["ship_name"]
+                    }
+                    haulers[hauler_id]["ships"].append(ship)
+
+            serialized_haulers = json.dumps(list(haulers.values()))
+
+        elif "_expand" in url['query_params']:
+            for row in query_results:
+
+                dock = {
+                    "id": row["dockId"],
+                    "location": row["dockLocation"],
+                    "capacity": row["dockCapacity"]
+                }
+                hauler = {
+                    "id": row['id'],
+                    "name": row['name'],
+                    "dock_id": row["dock_id"],
+                    "dock": dock
+                }
+
+                haulers.append(hauler)
+        # elif "_embed" in url["query_params"]:
+        #     for row in query_results:
+        #         ships = {
+        #             "id": row["shipId"],
+        #             "name": row["shipName"],
+        #             "hauler_id": row["shipHaulerId"]
+        #         }
+        #         hauler = {
+        #             "id": row['id'],
+        #             "name": row['name'],
+        #             "dock_id": row["dock_id"],
+        #             "ships": ships
+        #         }
+        #         haulers.append(hauler)
+
+        else:
             for row in query_results:
                 hauler = {
                     "id": row['id'],
                     "name": row['name'],
-                    "dock_id": row['dock_id']
+                    "dock_id": row["dock_id"],
                 }
-                haulers.append(hauler)
+                haulers.append(dict(row))
 
-            # Serialize the list of haulers to JSON encoded string
-            serialized_haulers = json.dumps(haulers)
+        serialized_haulers = json.dumps(haulers)
 
     return serialized_haulers
 
@@ -178,3 +207,58 @@ def retrieve_hauler(pk, url):
             serialized_hauler = json.dumps(dict(query_results))
 
     return serialized_hauler
+
+
+# haulers = {}
+
+#             # Iterate over query results
+#             for row in db_cursor.fetchall():
+#                 hauler_id = row['id']
+
+#                 # If the hauler is not in the dictionary, add it with its information
+#                 if hauler_id not in haulers:
+#                     haulers[hauler_id] = {
+#                         "id": hauler_id,
+#                         "name": row['name'],
+#                         "dock_id": row['dock_id'],
+#                         "ships": []
+#                     }
+
+#                 # Add the ship information to the hauler's embedded ships list
+#                 if row['ship_id']:
+#                     ship_info = {
+#                         "id": row['ship_id'],
+#                         "name": row['ship_name'],
+#                         "hauler_id": row['ship_hauler_id']
+#                     }
+#                     haulers[hauler_id]["ships"].append(ship_info)
+
+#             # Serialize the haulers dictionary to JSON encoded string
+#             serialized_haulers = json.dumps(list(haulers.values()))
+#         else:
+#             # Write the default SQL query to get hauler information
+#             db_cursor.execute("""
+#             SELECT
+#                 h.id,
+#                 h.name,
+#                 h.dock_id
+#             FROM Hauler h
+#             """)
+
+#             # Fetch all haulers
+#             query_results = db_cursor.fetchall()
+
+#             # Initialize an empty list and then add each dictionary to it
+#             haulers = []
+#             for row in query_results:
+#                 hauler = {
+#                     "id": row['id'],
+#                     "name": row['name'],
+#                     "dock_id": row['dock_id']
+#                 }
+#                 haulers.append(hauler)
+
+#             # Serialize the list of haulers to JSON encoded string
+#             serialized_haulers = json.dumps(haulers)
+
+#     return serialized_haulers
