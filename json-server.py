@@ -146,11 +146,6 @@ class JSONServer(HandleRequests):
                 response_body = {"id": new_ship_id}
                 return self.response(json.dumps(response_body), status.HTTP_201_SUCCESS_CREATED.value)
 
-        # # If the requested resource is not recognized, return a 404 Not Found response
-        # return self.response("Requested resource not found", status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND.value)
-        pass
-
-
 #
 # THE CODE BELOW THIS LINE IS NOT IMPORTANT FOR REACHING YOUR LEARNING OBJECTIVES
 #
