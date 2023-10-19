@@ -2,6 +2,27 @@ import sqlite3
 import json
 
 
+def create_ship(ship_data):
+    name = ship_data.get('name', '')
+    hauler_id = ship_data.get('hauler_id', 0)
+
+    with sqlite3.connect("./shipping.db") as conn:
+        db_cursor = conn.cursor()
+
+        # Insert a new ship into the database and retrieve its ID
+        db_cursor.execute("""
+            INSERT INTO Ship (name, hauler_id)
+            VALUES (?, ?)
+            """,
+                          (name, hauler_id)
+                          )
+
+        # Get the ID of the newly created ship
+        new_ship_id = db_cursor.lastrowid
+
+        return new_ship_id
+
+
 def update_ship(id, ship_data):
     with sqlite3.connect("./shipping.db") as conn:
         db_cursor = conn.cursor()
@@ -163,3 +184,23 @@ def retrieve_ship(pk, url):
             serialized_ship = json.dumps(dict(query_results))
 
     return serialized_ship
+
+def create_ship(ship_data):
+    name = ship_data.get('name', '')
+    hauler_id = ship_data.get('hauler_id', 0)
+
+    with sqlite3.connect("./shipping.db") as conn:
+        db_cursor = conn.cursor()
+
+        # Insert a new ship into the database and retrieve its ID
+        db_cursor.execute("""
+            INSERT INTO Ship (name, hauler_id)
+            VALUES (?, ?)
+            """,
+                          (name, hauler_id)
+                          )
+
+        # Get the ID of the newly created ship
+        new_ship_id = db_cursor.lastrowid
+
+        return new_ship_id
