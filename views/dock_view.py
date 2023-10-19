@@ -106,4 +106,4 @@ def create_dock(dock_data):
         # Get the ID of the newly created dock
         new_dock_id = db_cursor.lastrowid
 
-    return new_dock_id  # Return the newly created dock as a dictionary
+    return new_dock_id
