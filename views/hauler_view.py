@@ -38,7 +38,7 @@ def list_haulers(url):
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
         # Check if the '_embed' parameter exists in the URL dictionary
-        if "_embed" in url['query_params']:
+        if "_embed" in url['query_params'] and "ships" in url['query_params']['_embed']:
             # Handle the case when _embed exists in the URL
             db_cursor.execute("""
             SELECT
@@ -157,6 +157,7 @@ def retrieve_hauler(pk, url):
             # Serialize the hauler's information to JSON encoded string
             serialized_hauler = json.dumps(dict(query_results))
     return serialized_hauler
+
 
 def create_hauler(hauler_data):
     # Extract hauler data
